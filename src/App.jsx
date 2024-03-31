@@ -5,6 +5,7 @@ export default function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [results, setResults] = useState(false);
 
   const questions = [
     {
@@ -28,38 +29,56 @@ export default function App() {
   ];
 
   const currentQuestionObj = questions[currentQuestionIndex];
-
+  
   const handleAnswerChange = (event) => {
     const value = event.target.value;
+    if (value === currentQuestionObj.correctAnswer) {
+      setScore((prevValue) => prevValue + 1);
+    }
     setSelectedOption(value);
   };
 
+  
+  const handleNextClick = () => {
+    setCurrentQuestionIndex((prevVal) => prevVal + 1);
+    if (currentQuestionIndex + 1 >= questions.length) {
+      setResults(true);
+    }
+  };
+
+  
   return (
     <main>
       <h1>Quiz App</h1>
-      <h2>Question {currentQuestionObj.id}</h2>
-      <p>{currentQuestionObj.question}</p>
-      <ul>
-        {currentQuestionObj.options.map((option, index) => (
-          <li key={index}>
-            <label>
-              <input
-                type="radio"
-                value={option}
-                checked={selectedOption === option}
-                name={`quest_${currentQuestionObj.id}`}
-                onChange={handleAnswerChange}
-              />
-              {option}
-            </label>
-          </li>
-        ))}
-      </ul>
-      <button
-        onClick={() => setCurrentQuestionIndex((prevValue) => prevValue + 1)}
-      >
-        Next
-      </button>
+      {!results && (
+        <div>
+          <h2>Question {currentQuestionObj.id}</h2>
+          <p>{currentQuestionObj.question}</p>
+          <ul>
+            {currentQuestionObj.options.map((option, index) => (
+              <li key={index}>
+                <label>
+                  <input
+                    type="radio"
+                    value={option}
+                    checked={selectedOption === option}
+                    name={`quest_${currentQuestionObj.id}`}
+                    onChange={handleAnswerChange}
+                  />
+                  {option}
+                </label>
+              </li>
+            ))}
+          </ul>
+          <button onClick={handleNextClick}>Next</button>
+        </div>
+      )}
+      {results && (
+        <div>
+          <h2>Quiz Result</h2>
+          <p>Your score: {`${score}/ ${questions.length}`}</p>
+        </div>
+      )}
     </main>
   );
 }
